@@ -33,18 +33,27 @@ def readAScreenCast(link):
     global browser
     browser.get('https://codeschool.com' + link)
     html = browser.page_source
+    sleep(2)
     soup = BeautifulSoup(html ,'lxml')
-    return soup.find('a',{'class','tag'}).text, soup.find('span',{'class','has-tag--heading tci'}).text , soup.find('video')['src']
+    return soup.find('a',{'class','tag'}).text, soup.find('span',{'class','has-tag--heading tci'}).text , soup.find('video').src
     
 def getScreenCastLinks():
+    global browser
     Links = []
-    shows = ['https://www.codeschool.com/shows/watch-us-build','https://www.codeschool.com/shows/feature-focus','https://www.codeschool.com/shows/code-tv']
+    shows = ['https://www.codeschool.com/screencasts']
     for show in shows:
-        html = requests.get(show).text
+        browser.get(show)
+        sleep(2)
+        html = browser.page_source
         soup = BeautifulSoup(html, 'lxml')
-        print show
-        for link in soup.find_all('a',{'class','thumb thumb--m thumb--screenshot screencast-thumb'}):
-            Links.append(link['href'])
+        pages = soup.findAll('a',{'class','video-page-link'})
+      	for pagination in range(1, len(pages)-2):
+            for link in soup.findAll('a',{'class','twl'}):
+                Links.append(link['href'])
+            browser.find_element_by_css_selector('a.video-page-link:last-of-type').click()
+            sleep(2)
+            html = browser.page_source
+            soup = BeautifulSoup(html, 'lxml')
     
     return Links
 
