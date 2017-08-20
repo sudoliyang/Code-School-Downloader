@@ -9,7 +9,7 @@ import atexit
 
 Username = ""
 Password = ""
-browser = webdriver.Firefox()
+browser = webdriver.Chrome()
 
 def saveToJSON():
     global browser
@@ -32,10 +32,10 @@ def sign_in():
 def readAScreenCast(link):
     global browser
     browser.get('https://codeschool.com' + link)
-    html = browser.page_source
     sleep(2)
+    html = browser.page_source
     soup = BeautifulSoup(html ,'lxml')
-    return soup.find('a',{'class','tag'}).text, soup.find('span',{'class','has-tag--heading tci'}).text , soup.find('video').src
+    return soup.find('a',{'class','tag'}).text, soup.find('span',{'class','has-tag--heading tci'}).text , soup.find('video')["src"]
     
 def getScreenCastLinks():
     global browser
@@ -47,7 +47,7 @@ def getScreenCastLinks():
         html = browser.page_source
         soup = BeautifulSoup(html, 'lxml')
         pages = soup.findAll('a',{'class','video-page-link'})
-      	for pagination in range(1, len(pages)-2):
+      	for pagination in range(0, len(pages)-1):
             for link in soup.findAll('a',{'class','twl'}):
                 Links.append(link['href'])
             browser.find_element_by_css_selector('a.video-page-link:last-of-type').click()
@@ -57,7 +57,7 @@ def getScreenCastLinks():
     
     return Links
 
-sign_in() 
+sign_in()
 Links = getScreenCastLinks()
 
 Screencasts = []
