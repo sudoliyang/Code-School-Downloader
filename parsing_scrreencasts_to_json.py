@@ -9,7 +9,7 @@ import atexit
 
 Username = ""
 Password = ""
-browser = webdriver.Firefox()
+browser = webdriver.Chrome()
 
 def saveToJSON():
     global browser
@@ -32,23 +32,32 @@ def sign_in():
 def readAScreenCast(link):
     global browser
     browser.get('https://codeschool.com' + link)
+    sleep(2)
     html = browser.page_source
     soup = BeautifulSoup(html ,'lxml')
-    return soup.find('a',{'class','tag'}).text, soup.find('span',{'class','has-tag--heading tci'}).text , soup.find('video')['src']
+    return soup.find('a',{'class','tag'}).text, soup.find('span',{'class','has-tag--heading tci'}).text , soup.find('video')["src"]
     
 def getScreenCastLinks():
+    global browser
     Links = []
-    shows = ['https://www.codeschool.com/shows/watch-us-build','https://www.codeschool.com/shows/feature-focus','https://www.codeschool.com/shows/code-tv']
+    shows = ['https://www.codeschool.com/screencasts']
     for show in shows:
-        html = requests.get(show).text
+        browser.get(show)
+        sleep(2)
+        html = browser.page_source
         soup = BeautifulSoup(html, 'lxml')
-        print show
-        for link in soup.find_all('a',{'class','thumb thumb--m thumb--screenshot screencast-thumb'}):
-            Links.append(link['href'])
+        pages = soup.findAll('a',{'class','video-page-link'})
+      	for pagination in range(0, len(pages)-1):
+            for link in soup.findAll('a',{'class','twl'}):
+                Links.append(link['href'])
+            browser.find_element_by_css_selector('a.video-page-link:last-of-type').click()
+            sleep(2)
+            html = browser.page_source
+            soup = BeautifulSoup(html, 'lxml')
     
     return Links
 
-sign_in() 
+sign_in()
 Links = getScreenCastLinks()
 
 Screencasts = []
